@@ -40,9 +40,13 @@ INSTALLED_APPS = [
     # Local apps
     'home',
     'notes',
+
+    # Dev
+    'django_dump_die',
 ]
 
 MIDDLEWARE = [
+    'django_dump_die.middleware.DumpAndDieMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
