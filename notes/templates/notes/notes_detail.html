@@ -13,24 +13,35 @@
 
 <p>{{ note.likes }} Likes</p>
 
-<form action="{% url 'notes.like' pk=note.id %}" method="post" class="d-inline">
-  {% csrf_token %}
-  <button type="submit" class="btn btn-success my-5">👍</button>
-</form>
+{% if user.is_authenticated %}
+  <form action="{% url 'notes.like' pk=note.id %}" method="post" class="d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success my-5">👍</button>
+  </form>
+{% endif %}
 
-<form action="{% url 'notes.change_visibility' pk=note.id %}" method="post" class="d-inline">
-  {% csrf_token %}
-  <button type="submit" class="btn btn-success my-5">
-    {% if note.is_public %}
-      Make it private
-    {% else %}
-      Make it public
-    {% endif %}
-  </button>
-</form>
+{% if user.is_authenticated and user.id == note.user.id %}
+  <form action="{% url 'notes.change_visibility' pk=note.id %}" method="post" class="d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-success my-5">
+      {% if note.is_public %}
+        Make it private
+      {% else %}
+        Make it public
+      {% endif %}
+    </button>
+  </form>
+{% endif %}
 
-<a href="{% url 'notes.list' %}" class="btn btn-secondary my-5">Back</a>
+{% if user.is_authenticated %}
+  <a href="{% url 'notes.list' %}" class="btn btn-secondary my-5">Back</a>
+{% else %}
+  <a href="{% url 'notes.public.list' %}" class="btn btn-secondary my-5">Back</a>
+{% endif %}
+
+{% if user.is_authenticated and user.id == note.user.id %}
 <a href="{% url 'notes.update' pk=note.id %}" class="btn btn-secondary my-5">Edit</a>
 <a href="{% url 'notes.delete' pk=note.id %}" class="btn btn-warning"> Delete</a>
+{% endif %}
 
 {% endblock %}

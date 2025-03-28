@@ -17,6 +17,18 @@ class NotesListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return self.request.user.notes.all()
 
+class PublicNotesListView(ListView):
+    model = Notes
+    context_object_name = 'notes'
+    template_name = 'notes/notes_list.html'
+    queryset = Notes.objects.filter(is_public=True)
+
+class PublicNotesDetailView(DetailView):
+    model = Notes
+    context_object_name = 'note'
+    template_name = 'notes/notes_detail.html'
+    queryset = Notes.objects.filter(is_public=True)
+
 class PopularNotesListView(LoginRequiredMixin, ListView):
     model = Notes
     context_object_name = 'notes'
@@ -68,8 +80,11 @@ def add_like_view(request, pk):
 def change_visibility_view(request, pk):
     if request.method == 'POST':
         note = get_object_or_404(Notes, pk=pk)
-        note.is_public = not note.is_public
-        note.save()
+
+        if request.user.id == note.user.id:
+            note.is_public = not note.is_public
+            note.save()
+
         return HttpResponseRedirect(reverse('notes.detail', args=(pk,)))
     else:
         raise Http404
